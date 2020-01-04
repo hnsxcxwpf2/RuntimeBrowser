@@ -26,13 +26,14 @@ static const NSUInteger kPrivateFrameworks = 1;
 //    [self presentViewController:navigationController animated:YES completion:nil];
 //}
 
-/* */
+#pragma mark UISearchController回调: 获取有多少个section
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 2;
 }
 
 
+#pragma mark UISearchController回调: 获取section对应的标题
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     if(section == kPublicFrameworks) return @"Public Frameworks";
@@ -40,6 +41,7 @@ static const NSUInteger kPrivateFrameworks = 1;
     return nil;
 }
 
+#pragma mark UISearchController回调: 获取section对应多少个项目
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if(section == kPublicFrameworks)
@@ -53,13 +55,11 @@ static const NSUInteger kPrivateFrameworks = 1;
     return 0;
 }
 
+#pragma mark UISearchController回调: 根据NSIndexPath创建并返回UITableViewCell
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
     RTBFrameworkCell *cell = (RTBFrameworkCell *)[tableView dequeueReusableCellWithIdentifier:@"RTBFrameworkCell"];
-    
     NSBundle *b = nil;
-    
     if(indexPath.section == kPublicFrameworks)
     {
         b = [_filteredPublicFrameworks objectAtIndex:indexPath.row];
@@ -70,13 +70,12 @@ static const NSUInteger kPrivateFrameworks = 1;
     }
     
     NSString *name = [[[b bundlePath] lastPathComponent] stringByDeletingPathExtension];
-    
     cell.frameworkName = name;
-    
-    cell.accessoryType = [b isLoaded] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    cell.accessoryType = [b isLoaded] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;   //当前App已加载的Framework打对勾
     return cell;
 }
 
+#pragma mark UISearchController回调: 响应点击UITableViewCell事件
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSBundle *b = nil;
@@ -125,6 +124,7 @@ static const NSUInteger kPrivateFrameworks = 1;
     [self.navigationController pushViewController:listTVC animated:YES];
 }
 
+#pragma mark UISearchController回调: 响应搜索事件
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController
 {
 	NSString *filter = [searchController.searchBar.text lowercaseString];
@@ -148,6 +148,7 @@ static const NSUInteger kPrivateFrameworks = 1;
                                                 });
 }
 
+#pragma mark 响应Load All Framework按钮
 - (IBAction)loadAllFrameworks:(id)sender
 {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Loading All Frameworks" message:nil preferredStyle:UIAlertControllerStyleAlert];
@@ -264,6 +265,7 @@ static const NSUInteger kPrivateFrameworks = 1;
     [queue addOperation:op];
 }
 
+#pragma mark 获取某个磁盘目录下的所有framework
 - (NSArray *)frameworksAtPath:(NSString *)path
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -303,7 +305,6 @@ static const NSUInteger kPrivateFrameworks = 1;
     NSMutableArray *a = [NSMutableArray array];
     for(NSBundle *b in bundles)
     {
-        NSLog(@"%@",b.bundlePath);
         if([b isLoaded])
         {
             [a addObject:b];
@@ -312,6 +313,7 @@ static const NSUInteger kPrivateFrameworks = 1;
     return a;
 }
 
+#pragma mark    setPublicFrameworks
 - (void)setPublicFrameworks:(NSArray *)publicFrameworks
 {
 	_publicFrameworks = publicFrameworks;
@@ -319,6 +321,7 @@ static const NSUInteger kPrivateFrameworks = 1;
 	[self updateSearchResultsForSearchController:self.searchController];
 }
 
+#pragma mark    setPrivateFrameworks
 - (void)setPrivateFrameworks:(NSArray *)privateFrameworks
 {
 	_privateFrameworks = privateFrameworks;
@@ -326,6 +329,7 @@ static const NSUInteger kPrivateFrameworks = 1;
 	[self updateSearchResultsForSearchController:self.searchController];
 }
 
+#pragma mark    viewDidLoad
 - (void)viewDidLoad
 {
     self.title = @"Frameworks";

@@ -61,29 +61,38 @@ static RTBRuntime *sharedInstance;
 		sharedInstance.allClassStubsByImagePath = [NSMutableDictionary dictionary];
         sharedInstance.allProtocolsByName = [NSMutableDictionary dictionary];
 	}
+    
+    
 	return sharedInstance;
 }
 
 + (void)thisClassIsPartOfTheRuntimeBrowser {}
 
-- (RTBClass *)classStubForClassName:(NSString *)classname {
+#pragma mark 根据类名获取lclassStub
+- (RTBClass *)classStubForClassName:(NSString *)classname
+{
     return [_allClassStubsByName valueForKey:classname];
 }
 
-- (void)addProtocolsAdoptedByProtocol:(RTBProtocol *)p {
-    for(NSString *adoptedProtocolName in [p sortedAdoptedProtocolsNames]) {
+#pragma mark 根据RTBProtocol填充_allProtocolsByName
+- (void)addProtocolsAdoptedByProtocol:(RTBProtocol *)p
+{
+    for(NSString *adoptedProtocolName in [p sortedAdoptedProtocolsNames])
+    {
         RTBProtocol *ap = _allProtocolsByName[adoptedProtocolName];
-        if(ap == nil) {
+        if(ap == nil)
+        {
             ap = [RTBProtocol protocolStubWithProtocolName:adoptedProtocolName];
             _allProtocolsByName[adoptedProtocolName] = ap;
-            
             [self addProtocolsAdoptedByProtocol:ap];
         }
     }
 }
 
-- (RTBClass *)getOrCreateClassStubsRecursivelyForClass:(Class)klass {
-    
+
+#pragma mark 根据类名填充rootClasses allClassStubsByName allClassStubsByImagePath 以及_allProtocolsByName
+- (RTBClass *)getOrCreateClassStubsRecursivelyForClass:(Class)klass
+{
 	//Lookup the ClassStub for klass or create one if none exists and add it to +allClassStuds.
     NSString *klassName = NSStringFromClass(klass);
 	
@@ -94,7 +103,8 @@ static RTBRuntime *sharedInstance;
     // klass doesn't yet have a ClassStub...
 	cs = [RTBClass classStubWithClass:klass]; // Create a ClassStub for klass
 	
-	if(cs == nil) {
+	if(cs == nil)
+    {
 		NSLog(@"-- cannot create classStub for %@, ignore it", klassName);
 		return nil;
 	}
@@ -103,10 +113,14 @@ static RTBRuntime *sharedInstance;
     
     // users may want to ignore OCRuntime classes
     BOOL showOCRuntimeClasses = [[NSUserDefaults standardUserDefaults] boolForKey:@"RTBShowOCRuntimeClasses"];
-    if(showOCRuntimeClasses == NO && [path hasSuffix:@"OCRuntime.app/OCRuntime"])
+    if([path hasSuffix:@"OCRuntime.app/OCRuntime"])
     {
-        //NSLog(@"-- ignore %@", cs.classObjectName);
-        //return nil;
+        NSLog(@"本App自带 %@", cs.classObjectName);
+        if(showOCRuntimeClasses == NO)
+        {
+            NSLog(@"-- ignore %@", cs.classObjectName);
+            return nil;
+        }
     }
 
 	_allClassStubsByName[klassName] = cs; // Add it to our uniquing dictionary.
@@ -117,9 +131,11 @@ static RTBRuntime *sharedInstance;
     // will become
     //   /System/Library/PrivateFrameworks/CoreUI.framework/CoreUI
 
-    if([path hasPrefix:@"/Applications/"]) {
+    if([path hasPrefix:@"/Applications/"])
+    {
         NSUInteger i = [path rangeOfString:@".sdk"].location;
-        if(i != NSNotFound) {
+        if(i != NSNotFound)
+        {
             NSUInteger start = i + 4;
             path = [path substringFromIndex:start];
         }
@@ -127,29 +143,36 @@ static RTBRuntime *sharedInstance;
 #endif
     
     // ShowOCRuntimeClasses
-    
-	if(path) {
+	if(path)
+    {
 		NSMutableArray *stubsForImage = [_allClassStubsByImagePath valueForKey:path];
-		if(stubsForImage == nil) {
+		if(stubsForImage == nil)
+        {
             _allClassStubsByImagePath[path] = [NSMutableArray array];
 			stubsForImage = [_allClassStubsByImagePath valueForKey:path];
 		}
-		if([stubsForImage containsObject:cs] == NO) [stubsForImage addObject:cs]; // TODO: use a set?
+		if([stubsForImage containsObject:cs] == NO)
+            [stubsForImage addObject:cs]; // TODO: use a set?
 	}
 	
 	Class parent = class_getSuperclass(klass);   // Get klass's superclass 
-	if (parent != nil) {               // and recursively create (or get) its stub.
+	if (parent != nil)  // and recursively create (or get) its stub.
+    {
 		RTBClass *parentCs = [self getOrCreateClassStubsRecursivelyForClass:parent];
 		[parentCs addSubclassStub:cs];  // we are a subclass of our parent.
-	} else  // If there is no superclass, then klass is a root class.
+	}
+    else  // If there is no superclass, then klass is a root class.
+    {
 		[[self rootClasses] addObject:cs];
+    }
 	
-    /**/
-    
+    //添加类信息的时候顺便把相关的协议处理了
     NSArray *protocolNames = [cs sortedProtocolsNames];
-    for(NSString *protocolName in protocolNames) {
+    for(NSString *protocolName in protocolNames)
+    {
         RTBProtocol *p = _allProtocolsByName[protocolName];
-        if(p == nil) {
+        if(p == nil)
+        {
             p = [RTBProtocol protocolStubWithProtocolName:protocolName];
             _allProtocolsByName[protocolName] = p;
 
@@ -162,47 +185,54 @@ static RTBRuntime *sharedInstance;
     return cs;
 }
 
-- (NSArray *)sortedClassStubs {
-	if([_allClassStubsByName count] == 0) [self readAllRuntimeClasses];
+#pragma mark 获取排序后的class stubs
+- (NSArray *)sortedClassStubs
+{
+	if([_allClassStubsByName count] == 0)
+        [self readAllRuntimeClasses];
 	
 	NSMutableArray *stubs = [NSMutableArray arrayWithArray:[_allClassStubsByName allValues]];
 	[stubs sortUsingSelector:@selector(compare:)];
 	return stubs;
 }
 
-+ (NSArray *)readAndSortAllRuntimeProtocolNames {
-
+#pragma mark 获取排序后的所有协议
++ (NSArray *)readAndSortAllRuntimeProtocolNames
+{
     NSMutableArray *ma = [NSMutableArray array];
-    
     unsigned int protocolListCount = 0;
+#pragma mark 关键点 返回运行时所有已知的协议
     __unsafe_unretained Protocol **protocolList = objc_copyProtocolList(&protocolListCount);
-    for(NSUInteger i = 0; i < protocolListCount; i++) {
+    for(NSUInteger i = 0; i < protocolListCount; i++)
+    {
         __unsafe_unretained Protocol *p = protocolList[i];
         NSString *protocolName = NSStringFromProtocol(p);
         [ma addObject:protocolName];
     }
     free(protocolList);
-    
     [ma sortUsingSelector:@selector(compare:)];
-    
     return ma;
 }
 
-- (NSArray *)sortedProtocolStubs {
-    
+#pragma mark 获取排序后的所有ProtocolStubs
+- (NSArray *)sortedProtocolStubs
+{
     if([_allProtocolsByName count] == 0) {
         [self readAllRuntimeClasses];
     }
-    
     return [[_allProtocolsByName allValues] sortedArrayUsingSelector:@selector(compare:)];
 }
 
-- (void)readAllRuntimeClasses {
+#pragma mark 加载所有运行时类
+- (void)readAllRuntimeClasses
+{
 	int i, numClasses = 0;
+#pragma mark 关键点 返回运行时所有已知的类
 	int newNumClasses = objc_getClassList(NULL, 0);
 	Class *classes = NULL;
 
-	while (numClasses < newNumClasses) {
+	while (numClasses < newNumClasses)      //如果运行时类的数目有所增加, 就重新再次获取
+    {
 		numClasses = newNumClasses;
 		classes = (Class *)realloc(classes, sizeof(Class) * numClasses);
 		newNumClasses = objc_getClassList(classes, numClasses);
@@ -212,26 +242,33 @@ static RTBRuntime *sharedInstance;
 		[self getOrCreateClassStubsRecursivelyForClass:classes[i]];
 
 	free(classes);
-    
 	[_rootClasses sortUsingSelector:@selector(compare:)];
 }
 
-- (NSMutableDictionary *)allClassStubsByImagePath {
-	if([_allClassStubsByImagePath count] == 0) {
+#pragma mark 根据镜像路径获取所有运行时类stub
+- (NSMutableDictionary *)allClassStubsByImagePath
+{
+	if([_allClassStubsByImagePath count] == 0)
+    {
 		[self readAllRuntimeClasses];
 	}
 	return _allClassStubsByImagePath;
 }
 
-- (NSMutableArray *)rootClasses {
+#pragma mark 获取当前所有运行时类的class stub
+- (NSMutableArray *)rootClasses
+{
     /*" Classes are wrapped by ClassStub.  This array contains wrappers for root classes (classes that have no superclass). "*/
-	if ([_rootClasses count] == 0) {
+	if ([_rootClasses count] == 0)
+    {
 		[self readAllRuntimeClasses];
 	}
 	return _rootClasses;
 }
 
-- (void)emptyCachesAndReadAllRuntimeClasses {
+#pragma mark
+- (void)emptyCachesAndReadAllRuntimeClasses
+{
 /*"
 We autorelease and reset the nil the global, static containers that
  hold the parsed runtime info.  This forces the entire runtime to\

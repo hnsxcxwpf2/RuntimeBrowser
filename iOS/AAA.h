@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-typedef struct CStruct {
+typedef struct CStruct
+{
     struct CGImage *x;
 } MyCStruct;
 
@@ -18,7 +19,8 @@ typedef struct CStruct {
 
 @end
 
-@interface AAA : NSObject <AAAProtocol> {
+@interface AAA : NSObject <AAAProtocol>
+{
     struct dispatch_queue_s { }* _ipcQueue;
 }
 
@@ -27,7 +29,6 @@ typedef struct CStruct {
 @property (nonatomic) MyCStruct myStruct;
 
 + (NSString *)myClassMethod;
-
 - (NSString *)a:(NSString *)argA b:(NSString *)argB;
 - (MyCStruct)sayHello;
 

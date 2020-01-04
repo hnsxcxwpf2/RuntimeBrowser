@@ -436,6 +436,7 @@
     }
 }
 
+#pragma mark 入口点
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
     self.window.tintColor = [UIColor purpleColor];

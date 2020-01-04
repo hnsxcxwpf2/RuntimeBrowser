@@ -10,18 +10,19 @@
 
 @implementation AAA
 
-+ (NSString *)myClassMethod {
++ (NSString *)myClassMethod
+{
     return @"x";
 }
 
-- (NSString *)a:(NSString *)argA b:(NSString *)argB {
+- (NSString *)a:(NSString *)argA b:(NSString *)argB
+{
     return [NSString stringWithFormat:@"%@-%@", argA, argB];
 }
 
-- (MyCStruct)sayHello {
-    
+- (MyCStruct)sayHello
+{
     MyCStruct s;
-    
     return s;
 }
 

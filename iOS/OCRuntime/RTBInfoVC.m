@@ -59,7 +59,8 @@
 	self.webServerStatusLabel = nil;
 }
 
-- (IBAction)showOCRuntimeClassesAction:(id)sender {
+- (IBAction)showOCRuntimeClassesAction:(id)sender
+{
     [[NSUserDefaults standardUserDefaults] setBool:((UISwitch *)sender).isOn forKey:@"RTBShowOCRuntimeClasses"];
 }
 

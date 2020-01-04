@@ -51,15 +51,16 @@ static RTBRuntime *sharedInstance;
 
 @implementation RTBRuntime
 
-+ (RTBRuntime *)sharedInstance {
-	if(sharedInstance == nil) {
++ (RTBRuntime *)sharedInstance
+{
+	if(sharedInstance == nil)
+    {
 		sharedInstance = [[RTBRuntime alloc] init];
 		sharedInstance.rootClasses = [NSMutableArray array];
 		sharedInstance.allClassStubsByName = [NSMutableDictionary dictionary];
 		sharedInstance.allClassStubsByImagePath = [NSMutableDictionary dictionary];
         sharedInstance.allProtocolsByName = [NSMutableDictionary dictionary];
 	}
-	
 	return sharedInstance;
 }
 
@@ -102,9 +103,10 @@ static RTBRuntime *sharedInstance;
     
     // users may want to ignore OCRuntime classes
     BOOL showOCRuntimeClasses = [[NSUserDefaults standardUserDefaults] boolForKey:@"RTBShowOCRuntimeClasses"];
-    if(showOCRuntimeClasses == NO && [path hasSuffix:@"OCRuntime.app/OCRuntime"]) {
+    if(showOCRuntimeClasses == NO && [path hasSuffix:@"OCRuntime.app/OCRuntime"])
+    {
         //NSLog(@"-- ignore %@", cs.classObjectName);
-        return nil;
+        //return nil;
     }
 
 	_allClassStubsByName[klassName] = cs; // Add it to our uniquing dictionary.

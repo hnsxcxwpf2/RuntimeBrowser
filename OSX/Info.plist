@@ -75,9 +75,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.developer-tools</string>
+	<string>0.991</string>
 	<key>NSMainNibFile</key>
 	<string>RuntimeBrowser</string>
 	<key>NSPrincipalClass</key>

@@ -1,0 +1,102 @@
+{
+	entry = {
+		cell = PSLinkCell;
+		label = RuntimeBrowser;
+		icon = "runtimebrowser-logo.jpg";
+		items = (
+			{
+				bundle = AppList;
+				isController = 1;
+				cell = PSLinkCell;
+				label = "Enabled Applications";
+				ALSettingsPath = "/var/mobile/Library/Preferences/com.skfly.RuntimeBrowser.plist";
+				ALSettingsKeyPrefix = "RuntimeBrowserEnabled-";
+				"ALSettingsDefaultValue" = "";
+				ALAllowsSelection = 1;
+				ALSectionDescriptors = (
+					{
+						items = ();
+						"footer-title" = "\U9009\U62e9\U9700\U8981\U6d4f\U89c8\U8fd0\U884c\U65f6\U7c7b\U7684\U8fdb\U7a0b";
+					},
+					{
+						title = "\U7528\U6237APP";
+						predicate = "isSystemApplication = FALSE";
+						"icon-size" = 29;
+						"suppress-hidden-apps" = 1;
+						"cell-class-name" = ALSwitchCell;
+					},
+					{
+						title = "\U7cfb\U7edfAPP";
+						predicate = "isSystemApplication = TRUE AND NOT (displayIdentifier IN {'com.iptm.bigboss.sbsettings', 'com.booleanmagic.overboard', 'eu.heinelt.ifile'})";
+						"icon-size" = 29;
+						"suppress-hidden-apps" = 1;
+						"cell-class-name" = ALSwitchCell;
+					},
+				);
+			},
+			{
+				bundle = "ExtensionListSettings";
+				isController = 1;
+				cell = PSLinkCell;
+				label = "Avaliable Extensions(\U672a\U542f\U7528)";
+				ALSettingsPath = "/var/mobile/Library/Preferences/com.skfly.RuntimeBrowser.plist";
+				ALSettingsKeyPrefix = "RuntimeBrowserEnabled-";
+				"ALSettingsDefaultValue" = "";
+				ALAllowsSelection = 1;
+				ALSectionDescriptors = (
+					{
+						items = ();
+						"footer-title" = "Select which Plugins to load Reveal into.";
+					},
+					{
+						title = "Custom Keyboard";
+						predicate = "protocol contains 'keyboard-service'";
+						"icon-size" = 29;
+						"cell-class-name" = ELSwitchCell;
+					},
+					{
+						title = "share Extensions";
+						predicate = "protocol contains 'share-services'";
+						"icon-size" = 29;
+						"cell-class-name" = ELSwitchCell;
+					},
+					{
+						title = "AppleWatch App";
+						predicate = "protocol contains 'watchkit'";
+						"icon-size" = 29;
+						"cell-class-name" = ELSwitchCell;
+					},
+					{
+						title = "Today Extensions";
+						predicate = "protocol contains 'widget-extension'";
+						"icon-size" = 29;
+						"cell-class-name" = ELSwitchCell;
+					},
+					{
+						title = "Action Extensions";
+						predicate = "protocol contains 'ui-services'";
+						"icon-size" = 29;
+						"cell-class-name" = ELSwitchCell;
+					},
+					{
+						title = "PhotoEditing Extensions";
+						predicate = "protocol contains 'photo-editing'";
+						"icon-size" = 29;
+						"cell-class-name" = ELSwitchCell;
+					},
+				);
+			},
+			{
+				cell = PSGroupCell;
+				label = "\U81ea\U5b9a\U4e49\U8981Hook\U7684BundleID:";
+			},
+			{
+				cell = PSEditTextCell;
+				label = "";
+				defaults = "com.skfly.RuntimeBrowser";
+				key = CustomBundleID;
+				id = CustomBundleID;
+			},
+		);
+	};
+}

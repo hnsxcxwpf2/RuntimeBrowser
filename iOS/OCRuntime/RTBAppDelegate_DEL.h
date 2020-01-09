@@ -14,8 +14,11 @@
 @interface RTBAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+
+@property (strong, nonatomic) RTBRuntime *allClasses;
 @property (strong, nonatomic) GCDWebServer *webServer;
 
+- (GCDWebServerResponse *)responseForPath:(NSString *)path;
 - (NSString *)myIPAddress;
 - (UInt16)serverPort;
 

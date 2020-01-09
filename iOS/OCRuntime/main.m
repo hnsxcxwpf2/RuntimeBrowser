@@ -10,13 +10,10 @@
 
 #import "RTBAppDelegate.h"
 
-#import "../AAA.h"
-
 int main(int argc, char * argv[])
 {
     @autoreleasepool
     {
-        //NSLog(@"%@",[AAA myClassMethod]);
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([RTBAppDelegate class]));
     }
 }

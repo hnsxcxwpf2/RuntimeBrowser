@@ -1,0 +1,10 @@
+Package: com.skfly.runtimebrowser
+Name: runtimebrowser
+Depends: mobilesubstrate
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: 魏鹏飞
+Author: 魏鹏飞
+Section: Tweaks
+Version: 0.0.1-53
+Installed-Size: 368
